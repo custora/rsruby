@@ -79,12 +79,12 @@ class RSRuby
     @@r_flags = r_flags
   end
 
-  @@disable_underscore_translation = false
-  def self.disable_underscore_translation
-    @@disable_underscore_translation
+  @@underscore_translation = true
+  def self.underscore_translation
+    @@underscore_translation
   end
-  def self.disable_underscore_translation=(tf)
-    @@disable_underscore_translation = !!tf
+  def self.underscore_translation=(tf)
+    @@underscore_translation = !!tf
   end
 
   #Create a new RSRuby interpreter instance. The Singleton design pattern
@@ -197,7 +197,7 @@ class RSRuby
   #String with the real R name according to the rules given in the manual.
   def RSRuby.convert_method_name(name)
 
-    return name if @@disable_underscore_translation
+    return name if !@@underscore_translation
 
     if name.length > 1 and name[-1].chr == '_' and name[-2].chr != '_'
       name = name[0..-2]
