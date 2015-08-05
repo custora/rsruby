@@ -54,7 +54,7 @@ require 'complex'
 
 class RSRuby
 
-  VERSION = '0.5.4'
+  VERSION = '0.5.5'
 
   include Singleton
 
@@ -67,6 +67,8 @@ class RSRuby
   NO_CONVERSION = 0
   NO_DEFAULT = -1
 
+  VALID_CONVERSION_MODES = [-1, 0, 1, 2, 3, 4]
+
   attr_accessor :proc_table, :class_table, :default_mode, :caching
 
   @@r_flags = ["--quiet", "--vanilla"]
@@ -75,6 +77,14 @@ class RSRuby
   end
   def self.r_flags= r_flags
     @@r_flags = r_flags
+  end
+
+  @@disable_underscore_translation = false
+  def self.disable_underscore_translation
+    @@disable_underscore_translation
+  end
+  def self.disable_underscore_translation=(tf)
+    @@disable_underscore_translation = tf
   end
 
   #Create a new RSRuby interpreter instance. The Singleton design pattern
@@ -224,20 +234,27 @@ class RSRuby
 
   end
 
-  #Sets the default conversion mode for RSRuby. The constants defined
-  #in #RSRuby should be used
-  #DEPRECATED: Use the accessor instead
-  def RSRuby.set_default_mode(m)
-    if m < -1 or m > TOP_CONVERSION
-      raise ArgumentError, "Invalid mode requested"
-    end
-    RSRuby.instance.default_mode = m
+  # Sets the default conversion mode for RSRuby.
+
+  def RSRuby.set_default_mode(mode)
+    raise ArgumentError, "Invalid mode requested" if !VALID_CONVERSION_MODES.include?(mode)
+    RSRuby.instance.default_mode = mode
   end
-  #Returns the current default conversion mode as an Integer.
-  #DEPRECATED: Use the accessor on the RSRuby instance isntead
+
   def RSRuby.get_default_mode
     RSRuby.instance.default_mode
   end
+
+  def RSRuby.with_default_mode(mode)
+    original_mode = get_default_mode
+    begin
+      RSRuby.instance.set_default_mode(mode)
+      yield
+    ensure
+      RSRuby.instance.set_default_mode(original_mode)
+    end
+  end
+
 
   #TODO - not implemented
   def RSRuby.set_rsruby_input(m)
