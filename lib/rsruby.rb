@@ -87,6 +87,13 @@ class RSRuby
     @@underscore_translation = !!tf
   end
 
+  def underscore_translation
+    self.class.underscore_translation
+  end
+  def underscore_translation=(tf)
+    self.class.underscore_translation = tf
+  end
+
   #Create a new RSRuby interpreter instance. The Singleton design pattern
   #ensures that only one instance can be running in a script. Further
   #calls to RSRuby.instance will return the original instance.
@@ -197,7 +204,7 @@ class RSRuby
   #String with the real R name according to the rules given in the manual.
   def RSRuby.convert_method_name(name)
 
-    return name if !@@underscore_translation
+    return name if !@@underscore_translation   # must access class var, else you get a Singleton-related recursive error
 
     if name.length > 1 and name[-1].chr == '_' and name[-2].chr != '_'
       name = name[0..-2]
@@ -252,10 +259,10 @@ class RSRuby
   def RSRuby.with_default_mode(mode)
     original_mode = get_default_mode
     begin
-      RSRuby.instance.set_default_mode(mode)
+      RSRuby.set_default_mode(mode)
       yield
     ensure
-      RSRuby.instance.set_default_mode(original_mode)
+      RSRuby.set_default_mode(original_mode)
     end
   end
 
