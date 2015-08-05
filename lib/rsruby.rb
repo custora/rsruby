@@ -84,7 +84,7 @@ class RSRuby
     @@disable_underscore_translation
   end
   def self.disable_underscore_translation=(tf)
-    @@disable_underscore_translation = tf
+    @@disable_underscore_translation = !!tf
   end
 
   #Create a new RSRuby interpreter instance. The Singleton design pattern
@@ -196,6 +196,9 @@ class RSRuby
   #Converts a String representing a 'Ruby-style' R function name into a
   #String with the real R name according to the rules given in the manual.
   def RSRuby.convert_method_name(name)
+
+    return name if @@disable_underscore_translation
+
     if name.length > 1 and name[-1].chr == '_' and name[-2].chr != '_'
       name = name[0..-2]
     end
@@ -203,7 +206,8 @@ class RSRuby
     name = name.gsub(/([^\\])_/, '\1.')
     name = name.gsub(/^_/, '.')
     name = name.gsub(/\\_/, '_')
-    return name
+    name
+
   end
 
   #Converts an Array of function arguments into lcall format. If the last
