@@ -338,14 +338,13 @@ end
 
 class RException < RuntimeError
   def initialize(_msg)
-    RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
-      if RSRuby.instance.send('exists', {'x' => 'traceback.character'})[0]
-        @r_traceback = RSRuby.instance.send('traceback.character', {'max.lines' => 10})
-      else
-        r_full_traceback = RSRuby.instance.get(".Traceback")
-        r_shortened_traceback = r_full_traceback.map{|x| x.first(10)}
-        @r_traceback = r_shortened_traceback.flatten
-      end
+    r_full_traceback = RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
+      RSRuby.instance.send("traceback", {})
+    end
+    @r_traceback = if r_full_traceback
+      r_full_traceback.map{ |x| x.first(10) }.flatten
+    else
+      ["No traceback available"]
     end
     super
   end
