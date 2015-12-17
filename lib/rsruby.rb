@@ -342,7 +342,10 @@ class RException < RuntimeError
       RSRuby.instance.send("traceback", {})
     end
     @r_traceback = if r_full_traceback
-      r_full_traceback.map{ |x| x.first(10) }.flatten
+      r_full_traceback.map!{ |x| x.first(10) }.flatten!
+      r_full_traceback.map do |line|
+        line.length <= 500 ? line : line.first(500) + "...(#{line.length - 500} more characters)"
+      end
     else
       ["No traceback available"]
     end
@@ -351,6 +354,6 @@ class RException < RuntimeError
   def backtrace
     x = super
     return x if x.nil?
-    @r_traceback +x
+    @r_traceback + x
   end
 end
