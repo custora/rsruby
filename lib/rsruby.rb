@@ -338,8 +338,17 @@ end
 
 class RException < RuntimeError
   def initialize(_msg)
-    r_full_traceback = RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
-      RSRuby.instance.send("traceback", {})
+    begin
+      original_stdout = $stdout
+      original_stderr = $stderr
+      $stdout = File.open(File::NULL, 'w')
+      $stderr = File.open(File::NULL, 'w')
+      r_full_traceback = RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
+        RSRuby.instance.send("traceback", {})
+      end
+    ensure
+      $stdout = original_stdout
+      $stderr = original_stderr
     end
     @r_traceback = if r_full_traceback
       r_full_traceback.map!{ |x| x.first(10) }.flatten!
