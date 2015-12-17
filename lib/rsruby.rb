@@ -363,6 +363,7 @@ class RException < RuntimeError
   def backtrace
     x = super
     return x if x.nil?
-    @r_traceback + x
+    x
+    # @r_traceback + x
   end
 end
