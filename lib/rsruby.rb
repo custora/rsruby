@@ -339,16 +339,12 @@ end
 class RException < RuntimeError
   def initialize(_msg)
     begin
-      original_stdout = $stdout
-      original_stderr = $stderr
-      $stdout = File.open(File::NULL, 'w')
-      $stderr = File.open(File::NULL, 'w')
+      RSRuby.instance.send('sink', 'file' => '/dev/null')
       r_full_traceback = RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
         RSRuby.instance.send("traceback", {})
       end
     ensure
-      $stdout = original_stdout
-      $stderr = original_stderr
+      RSRuby.instance.send('sink', {})
     end
     @r_traceback = if r_full_traceback
       r_full_traceback.map!{ |x| x.first(10) }.flatten!
@@ -363,7 +359,6 @@ class RException < RuntimeError
   def backtrace
     x = super
     return x if x.nil?
-    x
-    # @r_traceback + x
+    @r_traceback + x
   end
 end
