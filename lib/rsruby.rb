@@ -347,10 +347,13 @@ class RException < RuntimeError
       RSRuby.instance.send('sink', {})
     end
     @r_traceback = if r_full_traceback
-      r_full_traceback.map!{ |x| x.first(10) }.flatten!
-      r_full_traceback.map do |line|
-        line.length <= 500 ? line : line.first(500) + "...(#{line.length - 500} more characters)"
-      end
+      r_full_traceback.map do |traceback_item|
+        if traceback_item.length > 10
+          traceback_item.first(10) + ["  ... (#{traceback_item.length - 10} more lines) ..."]
+        else
+          traceback_item
+        end
+      end.flatten
     else
       ["No traceback available"]
     end
