@@ -337,6 +337,8 @@ class RSRuby
 end
 
 class RException < RuntimeError
+  MAX_BACKTRACE_LINES = 100
+
   def initialize(_msg)
     begin
       RSRuby.instance.send('sink', 'file' => '/dev/null')
@@ -348,8 +350,8 @@ class RException < RuntimeError
     end
     @r_traceback = if r_full_traceback
       r_full_traceback.map do |traceback_item|
-        if traceback_item.length > 10
-          traceback_item.first(10) + ["  ... (#{traceback_item.length - 10} more lines) ..."]
+        if traceback_item.length > MAX_BACKTRACE_LINES
+          traceback_item.first(MAX_BACKTRACE_LINES) + ["  ... (#{traceback_item.length - MAX_BACKTRACE_LINES} more lines) ..."]
         else
           traceback_item
         end
