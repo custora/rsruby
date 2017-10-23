@@ -51,8 +51,7 @@ end
 File.open("config.h", "w") do |f|
   f.puts("#ifndef R_CONFIG_H")
   f.puts("#define R_CONFIG_H")
-  # r_home = $configure_args.has_key?('--with-R-dir') ? $configure_args['--with-R-dir'].inspect : 'NULL'
-  r_home = 'NULL'
+  r_home = $configure_args.has_key?('--with-R-dir') ? $configure_args['--with-R-dir'].inspect : 'NULL'
   f.puts("#define RSRUBY_R_HOME #{r_home}")
   f.puts("#endif")
 end
