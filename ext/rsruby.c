@@ -30,7 +30,7 @@
 */
 
 #include "rsruby.h"
-#include "config.h"
+#include "r_config.h"
 #include <stdlib.h>
 
 /* Global list to protect R objects from garbage collection */
@@ -57,7 +57,7 @@ void
 Robj_dealloc(SEXP robj)
 {
   R_ReleaseObject(robj);
- 
+
 }
 
 
@@ -82,7 +82,7 @@ VALUE get_fun(VALUE self, VALUE name){
     return Qnil;
 
   /* Wrap the returned R object as a ruby Object */
-  rubyobj = Data_Wrap_Struct(rb_const_get(rb_cObject, 
+  rubyobj = Data_Wrap_Struct(rb_const_get(rb_cObject,
 					  rb_intern("RObj")), 0, &Robj_dealloc , robj);
   rb_iv_set(rubyobj,"@conversion",INT2FIX(conversion));
   rb_iv_set(rubyobj,"@wrap",Qfalse);
@@ -96,8 +96,8 @@ void r_finalize(void)
 {
   unsigned char buf[1024];
   char * tmpdir;
-  
-  R_dot_Last();           
+
+  R_dot_Last();
   R_gc();  /* Remove any remaining R objects from memory */
 }
 
@@ -144,7 +144,7 @@ VALUE rr_init(VALUE self, VALUE r_argv){
       rb_raise(rb_eTypeError, "rr_init must receive an array of strings or NULL");
       break;
   }
-  
+
 
   argv[0] = (char *)malloc((strlen("rsruby") + 1) * sizeof(char));
   if (argv[0] == NULL) rb_raise(rb_eTypeError, "rr_init could not allocate memory");
@@ -174,17 +174,17 @@ void init_R(int argc, char **argv){
   }
 
   Rf_initialize_R(argc, argv);
-  R_Interactive = TRUE; 
+  R_Interactive = TRUE;
   R_CStackLimit = (uintptr_t)-1; //disable stack limit checking
   setup_Rmainloop();
   R_Interactive = FALSE; //Remove crash menu (and other interactive R features)
 }
-             
+
 /* This method is for testing catching of segfaults */
 VALUE crash(){
   int* ptr = (int*)0;
   *ptr = 1;
-  return Qtrue; 
+  return Qtrue;
 }
 
 
@@ -207,9 +207,8 @@ void Init_rsruby_c(){
   //Add the lcall method to RObj
   cRObj  = rb_const_get(rb_cObject,rb_intern("RObj"));
   rb_define_method(cRObj, "lcall", RObj_lcall, 1);
-  rb_define_method(cRObj, "__init_lcall__", RObj_init_lcall, 1);  
+  rb_define_method(cRObj, "__init_lcall__", RObj_init_lcall, 1);
   rb_define_method(cRObj, "to_ruby", RObj_to_ruby, -2);
 
 
 }
-
