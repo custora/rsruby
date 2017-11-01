@@ -339,7 +339,7 @@ end
 class RException < RuntimeError
   MAX_BACKTRACE_LINES = 100
 
-  def initialize(_msg)
+  def initialize(msg)
     begin
       RSRuby.instance.send('sink', 'file' => '/dev/null')
       r_full_traceback = RSRuby.with_default_mode(RSRuby::VECTOR_CONVERSION) do
@@ -359,7 +359,9 @@ class RException < RuntimeError
     else
       ["No traceback available"]
     end
-    super
+    # Force UTF-8 - would be better to read R settings but UTF-8 is a nicer
+    # default than ASCII-8BIT
+    super(msg.dup.force_encoding("UTF-8"))
   end
   def backtrace
     x = super
