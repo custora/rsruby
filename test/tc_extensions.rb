@@ -2,10 +2,10 @@ require 'test/unit'
 require 'rsruby'
 
 class TestNewCases < Test::Unit::TestCase
-  @@test_dir = File.expand_path File.dirname(__FILE__) 
-  
+  @@test_dir = File.expand_path File.dirname(__FILE__)
+
   def test_erobj
-    
+
     require 'rsruby/erobj'
     r = RSRuby.instance
     r.proc_table[lambda{|x| true}] = lambda{|x| ERObj.new(x)}
@@ -22,11 +22,11 @@ class TestNewCases < Test::Unit::TestCase
 
     require 'rsruby/dataframe'
     r = RSRuby.instance
-    r.class_table['data.frame'] = lambda{|x| DataFrame.new(x)}
+    r.class_table['data.frame'] = lambda{|x| RSRuby::DataFrame.new(x)}
     RSRuby.set_default_mode(RSRuby::CLASS_CONVERSION)
     table = r.read_table(@@test_dir+"/table.txt",:header=>true)
-    assert_instance_of(DataFrame,table)
-    
+    assert_instance_of(RSRuby::DataFrame,table)
+
     assert_equal(['A','B','C','D'],table.columns)
     assert_equal([1,2,3],table.rows)
 

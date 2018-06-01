@@ -11,7 +11,7 @@
 #Here we just set up a simple class table that returns a new DataFrame
 #object when a dataframe is returned by R
 #
-#  r.class_table['data.frame'] = lambda{|x| DataFrame.new(x)}
+#  r.class_table['data.frame'] = lambda{|x| RSRuby::DataFrame.new(x)}
 #  RSRuby.set_default_mode(RSRuby::CLASS_CONVERSION)
 #
 #We then create a dataframe object to test the conversion
