@@ -10,7 +10,7 @@
 #
 #First we setup the class_table Hash to convert dataframes to Ruby DataFrames
 #
-#  r.class_table['data.frame'] = lambda{|x| DataFrame.new(x)}
+#  r.class_table['data.frame'] = lambda{|x| RSRuby::DataFrame.new(x)}
 #  RSRuby.set_default_mode(RSRuby::CLASS_CONVERSION)
 #
 #Then we load the Bioconductor affy library and use eval_R to run some affy
@@ -18,7 +18,7 @@
 #
 #  r.library('affy')
 #
-#  r.eval_R("mydata <- ReadAffy()") 
+#  r.eval_R("mydata <- ReadAffy()")
 #  r.eval_R("eset.rma <- rma(mydata)")
 #  r.eval_R("eset.pma <- mas5calls(mydata)")
 #

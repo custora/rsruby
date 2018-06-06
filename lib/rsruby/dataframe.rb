@@ -4,14 +4,14 @@ require 'rsruby/erobj'
 #== Synopsis
 #
 #This is an extended ERObj class inspired by the example given in the RPy
-#manual used for R data frames. 
-#As with ERObj, methods caught by method_missing are converted into attribute 
+#manual used for R data frames.
+#As with ERObj, methods caught by method_missing are converted into attribute
 #calls on the R dataframe it represents. The rows and columns methods give
 #access to the column and row names.
 #
 #== Usage
 #
-#See examples/dataframe.rb[link:files/examples/dataframe_rb.html] for 
+#See examples/dataframe.rb[link:files/examples/dataframe_rb.html] for
 #examples of usage.
 #
 #--
@@ -45,63 +45,65 @@ require 'rsruby/erobj'
 #Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #++
 
-class DataFrame < ERObj
+class RSRuby
+  class DataFrame < ERObj
 
-  #Returns an array of the row names used in the R data frame.
-  def rows
-    return @r.attr(@robj, 'row.names')
-  end
-
-  #Returns an array of the column names used in the R data frame.
-  def columns
-    cols = @r.colnames(@robj)
-    cols = [cols] unless cols.kind_of?(Array)
-    return cols
-  end
-
-  #def[](col)
-  #  return @r['$'].call(@robj,col.to_s)
-  #end
-
-  #Needs to work for named and numbered columns
-  def[](row,col)
-    if col.kind_of?(Integer) and !(columns.include?(col))
-      col = columns[col]
+    #Returns an array of the row names used in the R data frame.
+    def rows
+      return @r.attr(@robj, 'row.names')
     end
-    return @r['$'].call(@robj,col.to_s)[row]
-  end
 
-  def[]=(row,col,val)
-    #How to set a value in this dataframe?
-    @r.assign("rsrubytemp",@robj)
-    
-    ### VERY HACKY - This relies on val having the same
-    #string representation in R and Ruby. An assign based
-    #solution with proper conversion of val would be much 
-    #better
-    @r.eval_R("rsrubytemp[#{row+1},#{col+1}] <- #{val}")
-    #
-    #@r.assign("rsrubytemp[#{row+1},#{col+1}]",val)
+    #Returns an array of the column names used in the R data frame.
+    def columns
+      cols = @r.colnames(@robj)
+      cols = [cols] unless cols.kind_of?(Array)
+      return cols
+    end
 
-    @robj = @r.eval_R('get("rsrubytemp")')
+    #def[](col)
+    #  return @r['$'].call(@robj,col.to_s)
+    #end
 
-    return @r['$'].call(@robj,columns[col].to_s)[row]
-  end
+    #Needs to work for named and numbered columns
+    def[](row,col)
+      if col.kind_of?(Integer) and !(columns.include?(col))
+        col = columns[col]
+      end
+      return @r['$'].call(@robj,col.to_s)[row]
+    end
 
-  def method_missing(attr)
-    attr = attr.to_s
-    mode = RSRuby.get_default_mode
-    RSRuby.set_default_mode(RSRuby::BASIC_CONVERSION)
-    column_names = @r.colnames(@robj)
-    if attr == column_names or column_names.include?(attr)
+    def[]=(row,col,val)
+      #How to set a value in this dataframe?
+      @r.assign("rsrubytemp",@robj)
+
+      ### VERY HACKY - This relies on val having the same
+      #string representation in R and Ruby. An assign based
+      #solution with proper conversion of val would be much
+      #better
+      @r.eval_R("rsrubytemp[#{row+1},#{col+1}] <- #{val}")
+      #
+      #@r.assign("rsrubytemp[#{row+1},#{col+1}]",val)
+
+      @robj = @r.eval_R('get("rsrubytemp")')
+
+      return @r['$'].call(@robj,columns[col].to_s)[row]
+    end
+
+    def method_missing(attr)
+      attr = attr.to_s
+      mode = RSRuby.get_default_mode
+      RSRuby.set_default_mode(RSRuby::BASIC_CONVERSION)
+      column_names = @r.colnames(@robj)
+      if attr == column_names or column_names.include?(attr)
+        RSRuby.set_default_mode(mode)
+        return @r['$'].call(@robj,attr.to_s)
+      end
+
+      #? Not sure what here...
       RSRuby.set_default_mode(mode)
-      return @r['$'].call(@robj,attr.to_s)
+      return super(attr)
+
     end
 
-    #? Not sure what here...
-    RSRuby.set_default_mode(mode)
-    return super(attr)
-
   end
-
 end
