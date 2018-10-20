@@ -9,7 +9,13 @@ if $configure_args.has_key?('--with-R-lib')
     exit 1
   end
 else
-  append_ldflags(`R CMD config --ldflags`.shellsplit)
+  if RUBY_PLATFORM =~ /darwin/
+    # Temporary changes due to new Xcode problems as of 2018-10-20.
+    # Some incorrect warnings get promoted to failures and cause bad installs.
+    append_ldflags(`R CMD config --ldflags`.shellsplit, {:werror => false})
+  else
+    append_ldflags(`R CMD config --ldflags`.shellsplit)
+  end
 end
 
 if $configure_args.has_key?('--with-R-include')
