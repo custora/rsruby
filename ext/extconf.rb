@@ -31,7 +31,7 @@ end
 File.open("r_config.h", "w") do |f|
   f.puts("#ifndef R_CONFIG_H")
   f.puts("#define R_CONFIG_H")
-  r_home = $configure_args.has_key?('--with-R-dir') || `R RHOME`.chomp
+  r_home = $configure_args['--with-R-dir'] || `R RHOME | grep -v ^WARNING:`.chomp
   f.puts("#define RSRUBY_R_HOME \"#{r_home}\"")
   f.puts("#endif")
 end
